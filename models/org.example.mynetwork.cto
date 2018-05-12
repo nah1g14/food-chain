@@ -1,0 +1,69 @@
+
+
+/**
+ * Write your model definitions here
+ */
+
+namespace org.example.mynetwork
+
+abstract participant Business identified by businessId {
+    o String businessId
+    o String firstName
+    o String lastName
+}
+
+participant Farmer extends Business{
+  o String city
+  o String country
+  o String description
+}
+
+participant Distributor extends Business{
+  o String city
+  o String country
+  o String description
+}
+
+participant Retailer extends Business{
+  o String city
+  o String country
+  o String description
+}
+
+participant Customer extends Business{
+  o String city
+  o String country
+  o String description
+}
+
+asset Item identified by itemId {
+  o String itemId
+  o String description
+  --> Business owner
+}
+
+abstract transaction Trade {
+  --> Item item
+}
+
+transaction FarmerToDistributor extends Trade {
+  --> Distributor newOwner
+}
+
+transaction DistributorToRetailer extends Trade {
+  --> Retailer newOwner
+}
+
+participant Regulator identified by regId {
+    o String regId
+    o String firstName
+    o String lastName
+}
+
+
+transaction GetItembyId {
+  String itemId
+}
+event tradeNotification{
+	--> Item item
+}

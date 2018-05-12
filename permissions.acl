@@ -1,0 +1,112 @@
+/*
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * Sample access control list.
+ */
+ /**
+  * Access control rules for tutorial-network
+  */
+
+rule NetworkControlPermission {
+  description:  "NetworkControl can access network commands"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.Network"
+  action: ALLOW
+}
+
+rule NetworkAdminUser {
+  description: "Grant business network administrators full access to user resources"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "**"
+  action: ALLOW
+}
+
+rule NetworkAdminSystem {
+  description: "Grant business network administrators full access to system resources"
+  participant: "org.hyperledger.composer.system.NetworkAdmin"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+rule R3_TradersSeeOwnHistoryOnly {
+    description: "Traders should be able to see the history of their own transactions only"
+    participant(t): "org.example.mynetwork.Business"
+    operation: READ
+    resource(v): "org.hyperledger.composer.system.HistorianRecord"
+    condition: (v.participantInvoking.getIdentifier() != t.getIdentifier())
+    action: DENY
+}
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+
+rule R1a_TraderSeeUpdateThemselvesOnly {
+  description: "Trader can see and update their own record only"
+  participant(t): "org.example.mynetwork.Business"
+  operation: READ, UPDATE
+  resource(v): "org.example.mynetwork.Business"
+  condition: (v.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule R1b_TraderSeeTheirCommodities {
+  description: "Trader can see/work with their own Commodities"
+  participant(t): "org.example.mynetwork.Business"
+  operation: ALL
+  resource(c): "org.example.mynetwork.Item"
+  condition: (c.owner.getIdentifier() == t.getIdentifier())
+  action: ALLOW
+}
+
+rule R2_EnableTrades {
+    description: "Enable users to trade"
+    participant: "org.example.mynetwork.Business"
+    operation: ALL
+    resource: "org.example.mynetwork.Trade"
+    action: ALLOW
+}
+
+rule R4a_RegulatorSeeThemselves {
+  description: "Regulators can see and update their own record"
+  participant: "org.example.mynetwork.Regulator"
+  operation: READ, UPDATE
+  resource: "org.example.mynetwork.Regulator"
+  action: ALLOW
+}
+
+
+rule R4b_RegTransView {
+    description: "Grant Regulator full access to Trade Transactions"
+    participant: "org.example.mynetwork.Regulator"
+    operation: ALL
+    resource: "org.example.mynetwork.Trade"
+    action: ALLOW
+}
+
+rule AllowFarmerToCreateItem {
+ 	description: "Grant Farmer access to create items"
+  	participant: "org.example.mynetwork.Farmer"
+  	operation: CREATE
+    resource: "org.example.mynetwork.Item"
+	action: ALLOW
+}
